@@ -27,3 +27,132 @@ AI Application
 AI Agent
   ↓
 Tool / API / Database
+
+AI Agent
+    │
+    │ Action Request
+    ▼
+┌─────────────────┐
+│   PISO Connect  │
+│                 │
+│  Agent          │
+│  Action         │
+│  Policy         │
+└────────┬────────┘
+         │
+    ALLOW / DENY
+         │
+         ▼
+     Tool / API
+
+pip install piso-connect
+
+git clone [https://github.com/pisoconnect/piso.git](https://github.com/pisoconnect/piso.git)
+cd piso
+pip install -e .
+
+from piso import authorize
+
+decision = authorize(
+    agent="research-agent",
+    action="search_repository"
+)
+
+print(decision)
+# Output: {"decision": "ALLOW"}
+
+from piso import authorize
+
+decision = authorize(
+    agent="research-agent",
+    action="delete_repository"
+)
+
+print(decision)
+# Output: {"decision": "DENY", "reason": "Action is not authorized"}
+
+AI SYSTEM
+                     │
+                     │ Action Request
+                     ▼
+              ┌─────────────┐
+              │ PISO Connect│
+              │             │
+              │ Agent       │
+              │ Action      │
+              │ Policy      │
+              └──────┬──────┘
+                     │
+              ┌──────┴──────┐
+              │             │
+            ALLOW          DENY
+              │             │
+              ▼             X
+          Tool / API     Blocked
+
+Agent + Action + Policy
+          │
+          ▼
+   PISO Security Decision
+          │
+      ┌───┴───┐
+      ▼       ▼
+    ALLOW    DENY
+
+agents:
+  research-agent:
+    allow:
+      - search_repository
+      - read_file
+    deny:
+      - delete_repository
+      - delete_database
+      - modify_production
+
+AI Agent ───> Database API ───> DELETE
+
+AI Agent ───> PISO Connect ───> Policy Check ───> DENY (Blocked)
+                                                     X
+                                         Production Database
+
+v0.1 (Current)
+Agent + Action + Policy
+        │
+        ▼
+v0.2
+Resource Scoping
+        │
+        ▼
+v0.3
+Identity + Authority Engine
+        │
+        ▼
+v0.4
+Risk Scoring
+        │
+        ▼
+v0.5
+Human-in-the-Loop Approval
+        │
+        ▼
+v0.6
+Audit Logging & Observability
+        │
+        ▼
+v1.0
+Native MCP / API / RAG / Agent Connectors
+
+AI Agent
+    │
+    │ (MCP Tool Call)
+    ▼
+PISO Connect
+    │
+    │ (Policy Decision: ALLOW)
+    ▼
+MCP Server
+    │
+    ▼
+Tool / API / Database
+
+AI Intent ───> Policy ───> PISO ───> Secure Action
